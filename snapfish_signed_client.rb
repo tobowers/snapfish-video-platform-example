@@ -4,6 +4,7 @@ require 'httpclient'
 
 require 'digest/sha1'
 require 'uri'
+require 'time'
 
 class SnapfishSignedClient
   HOST = "https://secure.motionbox.com"
@@ -45,8 +46,10 @@ private
   # so a POST request to /transcodes.json would look like
   # POST https://secure.motionbox.com/v1/accounts/<accountId>/transcodes.json?api_key=<api_key>&hashed_secret=<hashed_secret
   def signed_uri(url_or_uri)
+    time = Time.now + 120 #2 minutes
+    time_stamp = time.iso8601
     uri = URI.parse(url_or_uri.to_s)
-    additional_query_string = "api_key=#{@api_key}&hashed_secret=#{hashed_secret}"
+    additional_query_string = "api_key=#{@api_key}&time_stamp=#{time_stamp}hashed_secret=#{hashed_secret(time_stamp)}"
     join_character = (!uri.query || uri.query == '') ? "" : "&"
     uri.query = [uri.query, additional_query_string].join(join_character)
     return uri
@@ -62,8 +65,8 @@ private
   end
   
   # Your hashed secret is the SHA1 digest of api_key + secret
-  def hashed_secret
-    Digest::SHA1.hexdigest(@api_key + @secret)
+  def hashed_secret(time_stamp)
+    Digest::SHA1.hexdigest(@api_key + @secret + time_stamp)
   end
   
 end
