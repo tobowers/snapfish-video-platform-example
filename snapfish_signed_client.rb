@@ -8,9 +8,7 @@ require 'time'
 
 class SnapfishSignedClient
   HOST = "https://secure.motionbox.com"
-  
-  # https://secure.motionbox.com/v1/accounts/<account_id>/transcodes.json?api_key=<api_key>&hashed_secret
-  
+    
   def initialize(opts = {})
     @account_id = opts[:account_id]
     @api_key = opts[:api_key]
